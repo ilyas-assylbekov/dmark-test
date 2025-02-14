@@ -1,0 +1,9 @@
+node_modules
+frontend/dist
+frontend/public
+frontend/node_modules
+frontend/.next
+.env
+all_code_output.txt
+tree.txt
+build/
