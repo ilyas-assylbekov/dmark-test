@@ -41,6 +41,12 @@ func NewApp() *App {
 // Сохраняет контекст приложения
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	log.Println("Приложение запускается...")
+}
+
+// domReady вызывается после загрузки DOM на фронтенде
+func (a *App) domReady(ctx context.Context) {
+	log.Println("DOM готов")
 }
 
 // Методы для работы с фронтендом

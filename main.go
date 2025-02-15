@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -18,11 +19,19 @@ var assets embed.FS
 // main является точкой входа в приложение
 // Инициализирует и запускает Wails приложение с настроенными параметрами
 func main() {
+	// Настройка логирования
+	f, err := os.OpenFile("app.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
+
 	// Создание экземпляра структуры приложения
 	app := NewApp()
 
 	// Создание и запуск приложения с настройками
-	err := wails.Run(&options.App{
+	err = wails.Run(&options.App{
 		// Основные параметры окна приложения
 		Title:  "Task Manager", // Заголовок окна
 		Width:  1024,           // Ширина окна в пикселях

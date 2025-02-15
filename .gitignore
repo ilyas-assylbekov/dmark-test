@@ -7,3 +7,4 @@ frontend/.next
 all_code_output.txt
 tree.txt
 build/
+app.log
