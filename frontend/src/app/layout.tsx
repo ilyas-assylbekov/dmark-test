@@ -1,12 +1,14 @@
-// src/app/layout.tsx
+// Корневой макет приложения
 import type { Metadata } from "next";
 import "./globals.css";
 
+// Метаданные приложения для SEO и заголовка страницы
 export const metadata: Metadata = {
-  title: "Task Manager",
+  title: "DMARK Task Manager",
   description: "Task Management Application",
 };
 
+// Корневой компонент макета
 export default function RootLayout({
   children,
 }: Readonly<{

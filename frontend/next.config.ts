@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     unoptimized: true
   },
   assetPrefix: '.',
-  // Add this to handle static export
+  // Это для обработки статического экспорта
   trailingSlash: true,
 };
 

@@ -1,5 +1,6 @@
-'use client'
+'use client' // Указание на клиентский компонент
 
+// Импорты компонентов и утилит
 import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,27 +14,34 @@ import { Task } from '@/types/task'
 import type { CreateTaskInput } from '@/types/wails'
 
 export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [newTask, setNewTask] = useState('')
-  const [selectedDate, setSelectedDate] = useState<Date>()
-  const [priority, setPriority] = useState('0')
-  const [loading, setLoading] = useState(true)
+  // Состояния компонента
+  const [tasks, setTasks] = useState<Task[]>([])              // Список задач
+  const [newTask, setNewTask] = useState('')                  // Новая задача
+  const [selectedDate, setSelectedDate] = useState<Date>()    // Выбранная дата
+  const [priority, setPriority] = useState('0')               // Приоритет
+  const [loading, setLoading] = useState(true)                // Состояние загрузки
 
+  // Загрузка задач при монтировании компонента
   useEffect(() => {
     loadTasks()
   }, [])
 
+  // Функция загрузки задач с бэкенда
   const loadTasks = async () => {
     try {
       const result = await window.go.main.App.GetTasksByStatus()
-      setTasks([...result.Active, ...result.Completed])
+      setTasks([
+        ...(Array.isArray(result.Active) ? result.Active : []),
+        ...(Array.isArray(result.Completed) ? result.Completed : [])
+      ])
     } catch (error) {
-      console.error('Error loading tasks:', error)
+      console.error('Ошибка загрузки задач:', error)
     } finally {
       setLoading(false)
     }
   }
 
+  // Обработчики действий с задачами
   const handleAddTask = async () => {
     if (!newTask.trim()) return
 
@@ -41,7 +49,8 @@ export default function Home() {
       const input: CreateTaskInput = {
         title: newTask,
         priority: parseInt(priority),
-        dueDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd HH:mm:ss') : null
+        // Форматировать дату в формате ISO 8601
+        dueDate: selectedDate ? selectedDate.toISOString() : null
       }
       await window.go.main.App.CreateTask(input)
       setNewTask('')
@@ -49,7 +58,7 @@ export default function Home() {
       setPriority('0')
       await loadTasks()
     } catch (error) {
-      console.error('Error adding task:', error)
+      console.error('Ошибка добавления задачи:', error)
     }
   }
 
@@ -58,81 +67,84 @@ export default function Home() {
       await window.go.main.App.ToggleTask(id)
       await loadTasks()
     } catch (error) {
-      console.error('Error toggling task:', error)
+      console.error('Ошибка выбора задачи:', error)
     }
   }
 
   const handleDeleteTask = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this task?')) return
+    if (!confirm('Вы уверены, что хотите удалить эту задачу?')) return
 
     try {
       await window.go.main.App.DeleteTask(id)
       await loadTasks()
     } catch (error) {
-      console.error('Error deleting task:', error)
+      console.error('Ошибка удаления задачи:', error)
     }
   }
 
+  // Отображение загрузки
   if (loading) {
     return (
       <main className="container mx-auto p-4 max-w-4xl">
         <Card>
-          <CardContent className="p-8 text-center">
-            Loading tasks...
-          </CardContent>
+            <CardContent className="p-8 text-center">
+            Загрузка задач...
+            </CardContent>
         </Card>
       </main>
     )
   }
 
+  // Фильтрация задач по статусу
   const activeTasks = tasks.filter(task => !task.completed)
   const completedTasks = tasks.filter(task => task.completed)
 
+  // Рендер интерфейса
   return (
     <main className="container mx-auto p-4 max-w-4xl">
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Add New Task</CardTitle>
+          <CardTitle>Добавить Новую Задачу</CardTitle>
         </CardHeader>
         <CardContent className="flex gap-4">
           <Input
-            placeholder="Enter task title..."
+            placeholder="Введите название задачи..."
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
           />
           <Select value={priority} onValueChange={setPriority}>
             <SelectTrigger className="w-32">
-              <SelectValue placeholder="Priority" />
+              <SelectValue placeholder="Приоритет" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="0">Low</SelectItem>
-              <SelectItem value="1">Medium</SelectItem>
-              <SelectItem value="2">High</SelectItem>
+              <SelectItem value="0">Низкий</SelectItem>
+              <SelectItem value="1">Средний</SelectItem>
+              <SelectItem value="2">Высокий</SelectItem>
             </SelectContent>
           </Select>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-[200px]">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? format(selectedDate, 'PPP') : 'Pick due date'}
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {selectedDate ? format(selectedDate, 'PPP') : 'Выберите дату'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
               <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
               />
             </PopoverContent>
           </Popover>
-          <Button onClick={handleAddTask}>Add Task</Button>
+          <Button onClick={handleAddTask}>Добавить задачу</Button>
         </CardContent>
       </Card>
 
       <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Active Tasks ({activeTasks.length})</CardTitle>
+            <CardTitle>Активные Задачи ({activeTasks.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -168,7 +180,7 @@ export default function Home() {
         {completedTasks.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Completed Tasks ({completedTasks.length})</CardTitle>
+              <CardTitle>Завершенные Задачи ({completedTasks.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -206,6 +218,7 @@ export default function Home() {
   )
 }
 
+// Вспомогательная функция для определения цвета приоритета
 function getPriorityColor(priority: number): string {
   switch (priority) {
     case 2:
