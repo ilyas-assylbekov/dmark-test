@@ -162,3 +162,84 @@ dmark-test/
 1. Проверьте логи приложения
 2. Убедитесь в корректности настроек базы данных
 3. Проверьте версии зависимостей
+
+## Функциональность
+### Основные возможности:
+- ✅ **Добавление задач** — ввод текста, выбор приоритета и даты выполнения.
+- ✅ **Отображение списка задач** — активные и выполненные задачи.
+- ✅ **Удаление задач** — возможность удаления задач с подтверждением.
+- ✅ **Изменение статуса** — отметка задачи как выполненной и возможность отменить выполнение.
+- ✅ **Сохранение состояния** — все задачи сохраняются в базе данных (PostgreSQL) и загружаются при старте.
+
+### Дополнительные возможности:
+- ✅ **Приоритет задач** — низкий, средний и высокий.
+- ✅ **Дата выполнения** — выбор даты через календарь.
+- ✅ **Группировка задач** — разделение на активные и выполненные.
+- ✅ **База данных** — сохранение данных через GORM (PostgreSQL).
+
+## Скриншоты
+### Главный экран
+![Main Screen](screenshots/main.png)
+
+### Добавление задачи
+![Add Task 1](screenshots/add_task_1.png)
+![Add Task 2](screenshots/add_task_2.png)
+![Add Task 3](screenshots/add_task_3.png)
+
+### Валидация ввода (проверка на пустой ввод)
+- Валидация реализована в файле frontend/src/app/page.tsx, функция handleAddTask()
+```
+const handleAddTask = async () => {
+    if (!newTask.trim()) return;
+   ...
+}
+```
+
+### Задачи разных приоритетов
+![Priority 1](screenshots/priority_1.png)
+![Priority 2](screenshots/priority_2.png)
+![Priority 3](screenshots/priority_3.png)
+
+### Добавление даты
+![Date 1](screenshots/date_1.png)
+
+### Отмена отметки выполненной задачи
+![Cancel Completed Tasks 1](screenshots/cancel_completed_tasks_1.png)
+![Cancel Completed Tasks 2](screenshots/cancel_completed_tasks_2.png)
+
+### Удаление задачи
+![Delete Task 1](screenshots/delete_task_1.png)
+![Delete Task 2](screenshots/delete_task_2.png)
+
+### Выполненные задачи
+![Completed Tasks 1](screenshots/completed_tasks_1.png)
+![Completed Tasks 2](screenshots/completed_tasks_2.png)
+
+### Загрузка состояния задач при запуске приложения
+![Loading Tasks 1](screenshots/loading_tasks_1.png)
+![Loading Tasks 2](screenshots/loading_tasks_2.png)
+
+### Интерфейс для взаимодействия с репозиторием
+
+#### Репозиторий (TaskRepository)
+**Файл**: `internal/repository/task_repository.go`
+
+Методы для работы с задачами:
+- `Create(task *models.Task) error` — создание задачи
+- `GetAll() ([]models.Task, error)` — получение всех задач
+- `Update(task *models.Task) error` — обновление задачи
+- `Delete(id uint) error` — удаление задачи
+- `ToggleComplete(id uint) error` — смена статуса задачи
+
+#### Сервис (TaskService)
+**Файл**: `internal/service/task_service.go`
+
+Содержит бизнес-логику, использует TaskRepository
+
+Методы:
+- `CreateTask(input CreateTaskInput) error`
+- `GetTasksByStatus() (TaskList, error)`
+- `ToggleTask(id uint) error`
+- `DeleteTask(id uint) error`
+- `GetTasksByPriority() (map[int][]models.Task, error)`
+- `GetOverdueTasks() ([]models.Task, error)`
